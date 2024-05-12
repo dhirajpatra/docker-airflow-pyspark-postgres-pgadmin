@@ -1,0 +1,57 @@
+# version: '3.8'
+
+services:
+  postgres:
+    build:
+      context: ./postgres
+      dockerfile: Dockerfile
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  airflow:
+    build:
+      context: ./airflow
+      dockerfile: Dockerfile
+    container_name: airflow
+    ports:
+      - "8080:8080"
+    environment:
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:mysecretpassword@postgres:5432/airflow
+    depends_on:
+      - postgres
+
+  pyspark:
+    image: jupyter/pyspark-notebook:latest
+    container_name: pyspark
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+      - data_volume:/data
+    healthcheck:
+      test: ["CMD-SHELL", "jupyter kernelspec list | grep -q pyspark"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - airflow
+
+  postgres_admin:
+    image: adminer:latest
+    container_name: postgres_admin
+    ports:
+      - "8081:8080"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+  data_volume:
