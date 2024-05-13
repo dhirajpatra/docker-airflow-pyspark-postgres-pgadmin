@@ -74,3 +74,15 @@ Special thanks to the open-source community for providing the tools and framewor
 
 This README provides a starting point for aspiring data engineers to get familiar with the end-to-end data engineering application demo. Feel free to customize and expand upon it as needed. Happy data engineering!
 
+
+### Advance Steps to Process Data 
+
+Download any retail sales data. And convert it to csv.
+Create new database sales in pgsql by
+
+`docker exec -it -u postgres postgres psql -U postgres -p 5432`
+
+Import the csv data by pgadmin to sales databaes.
+
+
+
